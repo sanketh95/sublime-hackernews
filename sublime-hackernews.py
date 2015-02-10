@@ -1,5 +1,5 @@
 import sublime, sublime_plugin
-from .import hackernews, utils
+from .import hackernews
 
 def config_view(view, title='Hacker news'):
     # Wait until the view loads
