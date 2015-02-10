@@ -34,7 +34,7 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
         print(self.news_dict[val])
         article = self.news_dict[val]
         aview = self.window.new_file()
-        utils.config_view(aview, title=article['title'])
+        config_view(aview, title=article['title'])
         thread = hackernews.ArticleExtract(article['url'])
         thread.start()
         sublime.set_timeout(lambda: self.handle_article_thread(thread, aview), 5000)
