@@ -1,17 +1,22 @@
 import sublime, sublime_plugin
 from .import hackernews
 
-def config_view(view, title='Hacker news'):
+SETTINGS_FILE = 'sublime-hackernews.sublime-settings'
+DEFAULT_THEME = 'Packages/Color Scheme - Default/Dawn.tmTheme'
+
+def config_view(view, title='Hacker news', theme=DEFAULT_THEME):
     # Wait until the view loads
     while view.is_loading():
         pass
 
     view.set_name(title)
     view.set_scratch(True)
-    view.settings().set('color_scheme', 'Packages/Color Scheme - Default/Dawn.tmTheme')
+    view.settings().set('color_scheme', theme)
 
 class HackerNewsCommand(sublime_plugin.WindowCommand):
     def run(self):
+        self.settings = sublime.load_settings(SETTINGS_FILE)
+        hackernews.config_proxy(self.settings.get('http_proxy'))
         thread = hackernews.HackerNewsApiCall()
         thread.start()
         self.handle_thread(thread)
@@ -34,7 +39,7 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
             return
         article = self.news_dict[val]
         aview = self.window.new_file()
-        config_view(aview, title=article['title'])
+        config_view(aview, title=article['title'], theme=self.settings.get('theme'))
         thread = hackernews.ArticleExtract(article['url'])
         thread.start()
         self.handle_article_thread(thread, aview)
