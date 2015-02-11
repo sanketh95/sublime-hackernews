@@ -18,9 +18,8 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
         return
 
     def handle_thread(self, thread):
-        print('In handle_thread')
         if thread.result is None:
-            sublime.status_message('Waiting')
+            sublime.status_message('Fetching News')
             sublime.set_timeout(lambda: self.handle_thread(thread), 100)
             return
         elif thread.result is False:
@@ -41,12 +40,13 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
         self.handle_article_thread(thread, aview)
 
     def handle_article_thread(self, thread, view):
-        print('Handle article thread')
         if not thread.result:
+            sublime.status_message('Fetching %s' % thread.url)
             sublime.set_timeout(lambda: self.handle_article_thread(thread, view), 100)
             return
         view.run_command('show_article', {'data' : thread.result})
         
 class ShowArticleCommand(sublime_plugin.TextCommand):
     def run(self, edit, data):
+        sublime.status_message('Fetched')
         self.view.insert(edit, 0, data)

@@ -5,13 +5,6 @@ import threading
 API_URL = "http://node-hnapi.herokuapp.com"
 MARKDOWN_URL = "http://fuckyeahmarkdown.com/go/?read=1&u="
 
-PROXIES = {
-    'http' : 'http://172.16.44.86:8080',
-    'https' : 'https://172.16.44.86:8080',
-}
-opener = urllib.request.build_opener(urllib.request.ProxyHandler(PROXIES))
-urllib.request.install_opener(opener)
-
 class HackerNewsApiCall(threading.Thread):
     def __init__(self, timeout=5):
         self.result = None
