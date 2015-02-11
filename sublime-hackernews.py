@@ -14,12 +14,14 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = hackernews.HackerNewsApiCall()
         thread.start()
-        sublime.set_timeout(lambda: self.handle_thread(thread), 1000)
+        self.handle_thread(thread)
+        return
 
     def handle_thread(self, thread):
         print('In handle_thread')
         if thread.result is None:
-            print('Waiting')
+            sublime.status_message('Waiting')
+            sublime.set_timeout(lambda: self.handle_thread(thread), 100)
             return
         elif thread.result is False:
             sublime.error_message(thread.err)
@@ -31,24 +33,20 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
     def handle(self, val):
         if val == -1:
             return
-        print(self.news_dict[val])
         article = self.news_dict[val]
         aview = self.window.new_file()
         config_view(aview, title=article['title'])
         thread = hackernews.ArticleExtract(article['url'])
         thread.start()
-        sublime.set_timeout(lambda: self.handle_article_thread(thread, aview), 5000)
+        self.handle_article_thread(thread, aview)
 
     def handle_article_thread(self, thread, view):
         print('Handle article thread')
         if not thread.result:
+            sublime.set_timeout(lambda: self.handle_article_thread(thread, view), 100)
             return
         view.run_command('show_article', {'data' : thread.result})
         
 class ShowArticleCommand(sublime_plugin.TextCommand):
     def run(self, edit, data):
         self.view.insert(edit, 0, data)
-
-
-        
-
