@@ -50,3 +50,4 @@ class ShowArticleCommand(sublime_plugin.TextCommand):
     def run(self, edit, data):
         sublime.status_message('Fetched')
         self.view.insert(edit, 0, data)
+        self.view.set_read_only(True)
