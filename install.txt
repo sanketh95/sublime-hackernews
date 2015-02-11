@@ -1,0 +1,7 @@
+Sublime-HackerNews
+------------------
+
+Browse Hacker News from within the editor.
+
+
+To start using it press ctrl+alt+n.
