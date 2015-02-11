@@ -1,0 +1,29 @@
+[
+    {
+        "caption": "Preferences",
+        "mnemonic": "N",
+        "id": "preferences",
+        "children":
+        [
+            {
+                "caption": "Package Settings",
+                "mnemonic": "P",
+                "id": "package-settings",
+                "children":
+                [
+                    {
+                        "caption": "sublime-hackernews",
+                        "children":
+                        [
+                            {
+                                "command": "open_file",
+                                "args": {"file": "${packages}/sublime-hackernews/sublime-hackernews.sublime-settings"},
+                                "caption": "Settings – Default"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -7,3 +7,8 @@
 ## Usage
 
 - Press ctrl+alt+n from the sublime text window and the rest follows.
+
+## Configuring
+
+- Goto Preferences -> Package Settings -> sublime-hackernews -> Settings-Default.
+- Change http_proxy and theme settings as per your requirements and save.
