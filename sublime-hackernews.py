@@ -31,7 +31,8 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
             sublime.error_message(thread.err)
             return
         self.news_dict = thread.result
-        titles = [[item['title'], '%d comments' % item['comments_count']] for i, item in enumerate(self.news_dict)]
+        print(self.news_dict)
+        titles = [[item['title'], self._get_subtitle(item)] for i, item in enumerate(self.news_dict)]
         self.window.show_quick_panel(titles, on_select=self.handle)
 
     def handle(self, val):
@@ -50,7 +51,14 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
             sublime.set_timeout(lambda: self.handle_article_thread(thread, view), 100)
             return
         view.run_command('show_article', {'data' : thread.result})
-        
+
+    def _get_subtitle(self, item):
+        subtitle = '%d comments' % item['comments_count']
+        points = item['points']
+        if points:
+            subtitle += (' | %d points' % points)
+        return subtitle
+
 class ShowArticleCommand(sublime_plugin.TextCommand):
     def run(self, edit, data):
         sublime.status_message('Fetched')
