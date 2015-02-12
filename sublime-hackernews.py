@@ -31,7 +31,6 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
             sublime.error_message(thread.err)
             return
         self.news_dict = thread.result
-        print(self.news_dict)
         titles = [[item['title'], self._get_subtitle(item)] for i, item in enumerate(self.news_dict)]
         self.window.show_quick_panel(titles, on_select=self.handle)
 
