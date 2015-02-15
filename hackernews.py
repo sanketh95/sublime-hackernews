@@ -32,7 +32,7 @@ class HackerNewsApiCall(threading.Thread):
             self.result = False
 
 class ArticleExtract(threading.Thread):
-    def __init__(self, url, timeout=10):
+    def __init__(self, url, timeout=5):
         self.result = None
         self.url = url
         self.timeout = timeout
