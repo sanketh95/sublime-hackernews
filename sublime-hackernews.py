@@ -40,6 +40,8 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
         article = self.news_dict[val]
         aview = self.window.new_file()
         config_view(aview, title=article['title'], theme=self.settings.get('theme'))
+        aview.settings().set('article_id', article['id'])
+        aview.settings().set('article_title', article['title'])
         thread = hackernews.ArticleExtract(article['url'])
         thread.start()
         self.handle_article_thread(thread, aview)
@@ -63,3 +65,30 @@ class ShowArticleCommand(sublime_plugin.TextCommand):
         sublime.status_message('Fetched')
         self.view.insert(edit, 0, data)
         self.view.set_read_only(True)
+
+class ShowCommentsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        article_id = self.view.settings().get('article_id', None)
+        if article_id is None:
+            return
+        settings = sublime.load_settings(SETTINGS_FILE)
+        hackernews.config_proxy(settings.get('http_proxy'))
+        thread = hackernews.CommentsFetcher(article_id)
+        thread.start()
+        cview = self.view.window().new_file()
+        config_view(cview, title=self.view.settings().get('article_title', 'Comments'), 
+            theme=settings.get('theme'))
+        self.handle_comments_thread(thread, cview)
+
+    def handle_comments_thread(self, thread, view):
+        if thread.result is None:
+            sublime.status_message('Fetching comments')
+            sublime.set_timeout(lambda: self.handle_comments_thread(thread, view), 100)
+        elif thread.result is False:
+            sublime.error_message(thread.err)
+            return
+        comments = thread.result
+        self.print_comments(comments, view)
+        
+    def print_comments(self, comments, view):
+        print(comments)

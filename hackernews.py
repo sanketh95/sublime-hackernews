@@ -47,3 +47,20 @@ class ArticleExtract(threading.Thread):
         except:
             self.err = 'Failed to fetch the article'
             self.result = False
+
+class CommentsFetcher(threading.Thread):
+    def __init__(self, article_id, timeout=10):
+        self.article_id = article_id
+        self.timeout = timeout
+        self.result = None
+        self.err = None
+        threading.Thread.__init__(self)
+
+    def run(self):
+        try:
+            self.result = json.loads(urllib.request.urlopen(API_URL+"/item/"+str(self.article_id), 
+                timeout=self.timeout).read().decode())
+        except Exception as e:
+            self.err = 'Failed to fetch comments'
+            self.result = False
+
