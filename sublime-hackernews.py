@@ -47,9 +47,12 @@ class HackerNewsCommand(sublime_plugin.WindowCommand):
         self.handle_article_thread(thread, aview)
 
     def handle_article_thread(self, thread, view):
-        if not thread.result:
+        if thread.result is None:
             sublime.status_message('Fetching %s' % thread.url)
             sublime.set_timeout(lambda: self.handle_article_thread(thread, view), 100)
+            return
+        elif thread.result is False:
+            sublime.error_message(thread.err)
             return
         view.run_command('show_article', {'data' : thread.result})
 
@@ -69,6 +72,7 @@ class ShowArticleCommand(sublime_plugin.TextCommand):
 class ShowCommentsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         article_id = self.view.settings().get('article_id', None)
+        self.edit = edit
         if article_id is None:
             return
         settings = sublime.load_settings(SETTINGS_FILE)
@@ -84,11 +88,31 @@ class ShowCommentsCommand(sublime_plugin.TextCommand):
         if thread.result is None:
             sublime.status_message('Fetching comments')
             sublime.set_timeout(lambda: self.handle_comments_thread(thread, view), 100)
+            return
         elif thread.result is False:
             sublime.error_message(thread.err)
             return
         comments = thread.result
-        self.print_comments(comments, view)
-        
-    def print_comments(self, comments, view):
-        print(comments)
+        _comments = comments['comments']
+        view.run_command('print_comments', {'comments' : _comments})
+
+class PrintCommentsCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, comments):
+        self._offset = 0
+        self.edit = edit
+        self.print_comments(comments)
+
+    def print_comments(self, comments):
+        if not comments:
+            return
+        for comment in comments:
+            level = comment['level']
+            tabbing = '\t'*level
+            user = comment.get('user', 'User')
+            content = comment['content']
+            self._offset += self.view.insert(self.edit, self._offset, tabbing + content + '\n')
+            self._offset += self.view.insert(self.edit, self._offset, tabbing + '%s | %s\n\n' % (user, comment['time_ago']))
+            self.print_comments(comment['comments'])
+
+
