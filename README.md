@@ -11,6 +11,7 @@
 ## Usage
 
 - Press ctrl+alt+n from the sublime text window and the rest follows.
+- Press ctrl+alt+c while on the article window to open comments for that article
 
 ## Configuring
 
