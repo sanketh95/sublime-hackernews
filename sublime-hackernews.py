@@ -1,4 +1,5 @@
 import sublime, sublime_plugin
+import html.parser
 from .import hackernews
 
 SETTINGS_FILE = 'sublime-hackernews.sublime-settings'
@@ -12,6 +13,13 @@ def config_view(view, title='Hacker news', theme=DEFAULT_THEME):
     view.set_name(title)
     view.set_scratch(True)
     view.settings().set('color_scheme', theme)
+
+def print_content(content):
+    semi_pretty = ''.join(content.split('<p>'))
+    h = html.parser.HTMLParser()
+    semi_pretty = h.unescape(semi_pretty)
+    pretty_content = semi_pretty.replace('<i>', '_').replace('</i>','_')
+    return pretty_content
 
 class HackerNewsCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -102,6 +110,7 @@ class PrintCommentsCommand(sublime_plugin.TextCommand):
         self._offset = 0
         self.edit = edit
         self.print_comments(comments)
+        self.view.set_read_only(True)
 
     def print_comments(self, comments):
         if not comments:
@@ -110,9 +119,10 @@ class PrintCommentsCommand(sublime_plugin.TextCommand):
             level = comment['level']
             tabbing = '\t'*level
             user = comment.get('user', 'User')
-            content = comment['content']
+            content = print_content(comment['content'])
             self._offset += self.view.insert(self.edit, self._offset, tabbing + content + '\n')
             self._offset += self.view.insert(self.edit, self._offset, tabbing + '%s | %s\n\n' % (user, comment['time_ago']))
             self.print_comments(comment['comments'])
+
 
 
